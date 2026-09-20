@@ -1637,6 +1637,11 @@ textarea.text-input {
         <input type="email" id="contact-email" name="contact-email" class="text-input" placeholder="you@example.com">
       </div>
       <div class="field" style="margin-bottom:0;">
+        <label class="field-label" for="contact-phone">Phone number</label>
+        <input type="tel" id="contact-phone" name="contact-phone" class="text-input" placeholder="07123 456789">
+      </div>
+      <p style="margin:-10px 0 0; font-size:12px; color:#888;">Please provide at least one of email or phone so we can get back to you.</p>
+      <div class="field" style="margin-bottom:0;">
         <label class="field-label" for="contact-message">Message</label>
         <textarea id="contact-message" name="contact-message" class="text-input" maxlength="2000" placeholder="How can we help?" style="min-height:110px;"></textarea>
       </div>
@@ -1996,9 +2001,11 @@ textarea.text-input {
 
       var nameInput = document.getElementById('contact-name');
       var emailInput = document.getElementById('contact-email');
+      var phoneInput = document.getElementById('contact-phone');
       var messageInput = document.getElementById('contact-message');
       var nameVal = nameInput.value.trim();
       var emailVal = emailInput.value.trim();
+      var phoneVal = normalisePhone(phoneInput.value);
       var messageVal = messageInput.value.trim();
 
       if (!nameVal) {
@@ -2006,9 +2013,20 @@ textarea.text-input {
         markError(nameInput);
         return;
       }
-      if (!emailVal || !isValidEmail(emailVal)) {
+      if (!emailVal && !phoneVal) {
+        alert('Please provide an email address or a phone number.');
+        markError(emailInput);
+        markError(phoneInput);
+        return;
+      }
+      if (emailVal && !isValidEmail(emailVal)) {
         alert('Please enter a valid email address.');
         markError(emailInput);
+        return;
+      }
+      if (phoneVal && !isValidPhone(phoneVal)) {
+        alert(PHONE_ERROR);
+        markError(phoneInput);
         return;
       }
       if (!messageVal) {
@@ -2021,6 +2039,7 @@ textarea.text-input {
         type: 'contact',
         name: nameVal,
         email: emailVal,
+        phone: phoneVal,
         message: messageVal,
         submittedAt: new Date().toISOString()
       };
