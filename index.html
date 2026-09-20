@@ -1547,7 +1547,7 @@ textarea.text-input {
     </div>
 
     <h1 class="order-title">Subscribe to TimeTable+</h1>
-    <p class="order-sub">Just a few details and you're set - £2 every 6 months. (You have to manually buy it every 6 months, I can't code 😔)</p>
+    <p class="order-sub">Just a few details and you're set - £2 every 6 months.</p>
 
     <form id="subscribe-form" novalidate>
       <div class="field">
@@ -1975,9 +1975,15 @@ textarea.text-input {
   function sendToWebhook(payload) {
     return fetch(WEBHOOK_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok || data.ok === false) {
+          throw new Error(data.error || ('Webhook returned ' + res.status));
+        }
+        return data;
+      });
     });
   }
 
@@ -2024,7 +2030,7 @@ textarea.text-input {
     confirmationPage.style.display = 'flex';
     window.scrollTo(0, 0);
 
-    var opened = window.open(monzoLink, '_blank');
+    var opened = window.open(monzoLink, '_blank', 'noopener,noreferrer');
     if (!opened && payNote) {
       payNote.textContent = 'Tap the button below to complete payment on Monzo.';
     }
@@ -2044,6 +2050,7 @@ textarea.text-input {
   var TT_MAX_INPUT_BYTES = 20 * 1024 * 1024;
   var TT_MAX_EDGE = 1600;
   var TT_MAX_BASE64 = 3500000;
+  var TT_MAX_TOTAL_BASE64 = 5500000; // combined cap across all images so the webhook request stays small and reliable
 
   ttModeRadios.forEach(function (radio) {
     radio.addEventListener('change', function () {
@@ -2093,10 +2100,10 @@ textarea.text-input {
     ttRenderPreview();
   }
 
-  function ttEncode(img) {
+  function ttEncode(img, maxBase64) {
     var scale = Math.min(1, TT_MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
     var quality = 0.85;
-    for (var attempt = 0; attempt < 5; attempt++) {
+    for (var attempt = 0; attempt < 6; attempt++) {
       var w = Math.max(1, Math.round(img.naturalWidth * scale));
       var h = Math.max(1, Math.round(img.naturalHeight * scale));
       var canvas = document.createElement('canvas');
@@ -2107,9 +2114,9 @@ textarea.text-input {
       ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       var dataUrl = canvas.toDataURL('image/jpeg', quality);
-      if (dataUrl.length <= TT_MAX_BASE64 || attempt === 4) return dataUrl;
-      quality -= 0.1;
-      scale *= 0.8;
+      if (dataUrl.length <= maxBase64 || attempt === 5) return dataUrl;
+      quality -= 0.12;
+      scale *= 0.78;
     }
   }
 
@@ -2129,7 +2136,10 @@ textarea.text-input {
     var img = new Image();
     img.onload = function () {
       try {
-        var dataUrl = ttEncode(img);
+        var currentTotal = ttImages.reduce(function (sum, it) { return sum + it.data.length; }, 0);
+        var remainingSlots = Math.max(1, TT_MAX_IMAGES - ttImages.length);
+        var perImageBudget = Math.min(TT_MAX_BASE64, Math.max(600000, Math.floor((TT_MAX_TOTAL_BASE64 - currentTotal) / remainingSlots)));
+        var dataUrl = ttEncode(img, perImageBudget);
         var base = file.name.replace(/\.[^.]+$/, '') || 'timetable';
         ttImages.push({
           fileName: base + '.jpg',
@@ -2288,12 +2298,15 @@ textarea.text-input {
       if (submitBtn) submitBtn.classList.add('is-loading');
 
       sendToWebhook(payload)
+        .then(function () {
+          finishOrder(orderPage, monzoLink);
+        })
         .catch(function (err) {
           console.error('Webhook submission failed:', err);
+          alert("Sorry, something went wrong sending your order. Please try again, or email timetable.support.app@gmail.com if it keeps happening.");
         })
         .finally(function () {
           if (submitBtn) submitBtn.classList.remove('is-loading');
-          finishOrder(orderPage, monzoLink);
         });
     });
   }
@@ -2340,12 +2353,15 @@ textarea.text-input {
       if (submitBtn) submitBtn.classList.add('is-loading');
 
       sendToWebhook(payload)
+        .then(function () {
+          finishOrder(subscribePage, SUBSCRIBE_MONZO_LINK);
+        })
         .catch(function (err) {
           console.error('Webhook submission failed:', err);
+          alert("Sorry, something went wrong sending your subscription. Please try again, or email timetable.support.app@gmail.com if it keeps happening.");
         })
         .finally(function () {
           if (submitBtn) submitBtn.classList.remove('is-loading');
-          finishOrder(subscribePage, SUBSCRIBE_MONZO_LINK);
         });
     });
   }
