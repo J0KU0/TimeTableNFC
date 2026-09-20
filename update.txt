@@ -1,3 +1,7 @@
+UpdateName: Squished those lil' bugs
+DateNTime: 20/09/2026 11:21
+UpdateDescription: Squishy Squishy, Form errors are now fixed and now should receive way less errors.
+
 UpdateName: Improved security of the site
 DateNTime: 20/09/2026 10:32
 UpdateDescription: Payments and forms now have encryption keys built into them.
