@@ -473,10 +473,25 @@ section { padding: 84px 0; }
 }
 
 .price-card {
+  position: relative;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: 22px;
   padding: 36px;
+  box-shadow: var(--shadow);
+}
+
+.price-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #fff;
+  color: #888;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
 
@@ -1295,6 +1310,7 @@ textarea.text-input {
 
     <div class="price-row">
       <div class="price-card reveal">
+        <span class="price-badge">1 Sold</span>
         <div style="font-size:14px; color:var(--ink-soft);">TimeTable NFC tag</div>
         <div class="price-figure">
           <span class="amount">£1</span>
@@ -1334,7 +1350,7 @@ textarea.text-input {
           <span class="amount">£2</span>
           <span class="period">/ every 6 months</span>
         </div>
-        <div class="price-then">Optional - DO NOT BUY IF YOU DON'T HAVE A TAG, not required for the tag to work</div>
+        <div class="price-then">Optional - on top of your one-off tag</div>
 
         <ul class="price-list">
           <li><span class="check">🕷️</span> Bug and error fixes</li>
@@ -1654,6 +1670,12 @@ textarea.text-input {
       <p style="margin:0;">Thanks! Your message has been sent - we'll get back to you at the email you gave us.</p>
       <button type="button" class="btn btn-ghost" id="contact-close-btn" style="margin-top:18px; width:100%; justify-content:center;">Close</button>
     </div>
+
+    <div id="contact-cooldown" style="display:none; text-align:center;">
+      <p style="margin:0;">You've already sent a message recently. To avoid spam, you can only send one message every 2 hours.</p>
+      <p style="margin:14px 0 0; font-weight:600;">Please try again in <span id="contact-cooldown-time">--</span>.</p>
+      <button type="button" class="btn btn-ghost" id="contact-cooldown-close-btn" style="margin-top:18px; width:100%; justify-content:center;">Close</button>
+    </div>
   </div>
 </div>
 
@@ -1967,8 +1989,67 @@ textarea.text-input {
   var contactCancelBtn = document.getElementById('contact-cancel-btn');
   var contactCloseBtn = document.getElementById('contact-close-btn');
   var contactSuccess = document.getElementById('contact-success');
+  var contactCooldown = document.getElementById('contact-cooldown');
+  var contactCooldownTime = document.getElementById('contact-cooldown-time');
+  var contactCooldownCloseBtn = document.getElementById('contact-cooldown-close-btn');
+
+  var CONTACT_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 1 request per 2 hours per device
+  var CONTACT_LAST_SENT_KEY = 'tt_contact_last_sent';
+  var contactCooldownInterval = null;
+
+  function getContactCooldownRemaining() {
+    var last = 0;
+    try {
+      last = parseInt(localStorage.getItem(CONTACT_LAST_SENT_KEY), 10) || 0;
+    } catch (e) {
+      last = 0;
+    }
+    var remaining = CONTACT_COOLDOWN_MS - (Date.now() - last);
+    return remaining > 0 ? remaining : 0;
+  }
+
+  function markContactSent() {
+    try {
+      localStorage.setItem(CONTACT_LAST_SENT_KEY, String(Date.now()));
+    } catch (e) { /* ignore, e.g. storage disabled */ }
+  }
+
+  function formatCooldown(ms) {
+    var totalMinutes = Math.ceil(ms / 60000);
+    var hours = Math.floor(totalMinutes / 60);
+    var minutes = totalMinutes % 60;
+    if (hours > 0 && minutes > 0) return hours + 'h ' + minutes + 'm';
+    if (hours > 0) return hours + 'h';
+    return Math.max(minutes, 1) + 'm';
+  }
+
+  function showContactCooldown() {
+    if (contactForm) contactForm.style.display = 'none';
+    if (contactSuccess) contactSuccess.style.display = 'none';
+    if (contactCooldown) contactCooldown.style.display = 'block';
+
+    function tick() {
+      var remaining = getContactCooldownRemaining();
+      if (remaining <= 0) {
+        if (contactCooldownInterval) clearInterval(contactCooldownInterval);
+        closeContactModal();
+        return;
+      }
+      if (contactCooldownTime) contactCooldownTime.textContent = formatCooldown(remaining);
+    }
+    tick();
+    if (contactCooldownInterval) clearInterval(contactCooldownInterval);
+    contactCooldownInterval = setInterval(tick, 15000);
+  }
 
   function openContactModal() {
+    var remaining = getContactCooldownRemaining();
+    if (remaining > 0) {
+      showContactCooldown();
+      openModal(contactModal);
+      return;
+    }
+    if (contactCooldown) contactCooldown.style.display = 'none';
     if (contactForm) {
       contactForm.style.display = 'flex';
       contactForm.reset();
@@ -1980,12 +2061,17 @@ textarea.text-input {
   }
 
   function closeContactModal() {
+    if (contactCooldownInterval) {
+      clearInterval(contactCooldownInterval);
+      contactCooldownInterval = null;
+    }
     closeModal(contactModal);
   }
 
   if (contactBtn) contactBtn.addEventListener('click', openContactModal);
   if (contactCancelBtn) contactCancelBtn.addEventListener('click', closeContactModal);
   if (contactCloseBtn) contactCloseBtn.addEventListener('click', closeContactModal);
+  if (contactCooldownCloseBtn) contactCooldownCloseBtn.addEventListener('click', closeContactModal);
   if (contactModal) {
     contactModal.addEventListener('click', function (e) {
       if (e.target === contactModal) closeContactModal();
@@ -1998,6 +2084,11 @@ textarea.text-input {
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
+
+      if (getContactCooldownRemaining() > 0) {
+        showContactCooldown();
+        return;
+      }
 
       var nameInput = document.getElementById('contact-name');
       var emailInput = document.getElementById('contact-email');
@@ -2049,6 +2140,7 @@ textarea.text-input {
 
       sendToWebhook(payload)
         .then(function () {
+          markContactSent();
           contactForm.style.display = 'none';
           if (contactSuccess) contactSuccess.style.display = 'block';
         })
