@@ -1432,7 +1432,7 @@ textarea.text-input {
   <div class="footer-top">Built by students, for students</div>
   <div class="footer-row">
     <div>TimeTable</div>
-    <div>timetable.support.app@gmail.com</div>
+    <button type="button" class="btn btn-ghost" id="contact-support-btn" style="padding:8px 16px; font-size:13px;">Contact Support</button>
   </div>
 </footer>
 
@@ -1619,6 +1619,36 @@ textarea.text-input {
     <p>The subscription is only for current NFC tag owners.</p>
     <button type="button" class="btn btn-primary" id="subscribe-gate-ok">I have an NFC tag let me in!</button>
     <button type="button" class="btn btn-ghost" id="subscribe-gate-cancel">Cancel</button>
+  </div>
+</div>
+
+<div id="contact-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+  <div class="modal-card" style="max-width:400px; text-align:left;">
+    <h3 id="contact-modal-title" style="text-align:center;">Contact Support</h3>
+    <p style="text-align:center;">Have a question or a problem? Send us a message and we'll get back to you by email.</p>
+
+    <form id="contact-form" novalidate style="margin-top:18px; display:flex; flex-direction:column; gap:18px;">
+      <div class="field" style="margin-bottom:0;">
+        <label class="field-label" for="contact-name">Name</label>
+        <input type="text" id="contact-name" name="contact-name" class="text-input" placeholder="Your name">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label class="field-label" for="contact-email">Email address</label>
+        <input type="email" id="contact-email" name="contact-email" class="text-input" placeholder="you@example.com">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label class="field-label" for="contact-message">Message</label>
+        <textarea id="contact-message" name="contact-message" class="text-input" maxlength="2000" placeholder="How can we help?" style="min-height:110px;"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary order-submit" style="width:100%; justify-content:center;">Send message</button>
+      <button type="button" class="btn btn-ghost" id="contact-cancel-btn" style="width:100%; justify-content:center; margin-top:-6px;">Cancel</button>
+    </form>
+
+    <div id="contact-success" style="display:none; text-align:center;">
+      <div class="confirmation-check" style="width:56px; height:56px; font-size:26px; margin:0 auto 14px;">&#10003;</div>
+      <p style="margin:0;">Thanks! Your message has been sent - we'll get back to you at the email you gave us.</p>
+      <button type="button" class="btn btn-ghost" id="contact-close-btn" style="margin-top:18px; width:100%; justify-content:center;">Close</button>
+    </div>
   </div>
 </div>
 
@@ -1923,6 +1953,93 @@ textarea.text-input {
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && subscribeGate.style.display !== 'none') closeSubscribeGate();
+    });
+  }
+
+  var contactBtn = document.getElementById('contact-support-btn');
+  var contactModal = document.getElementById('contact-modal');
+  var contactForm = document.getElementById('contact-form');
+  var contactCancelBtn = document.getElementById('contact-cancel-btn');
+  var contactCloseBtn = document.getElementById('contact-close-btn');
+  var contactSuccess = document.getElementById('contact-success');
+
+  function openContactModal() {
+    if (contactForm) {
+      contactForm.style.display = 'flex';
+      contactForm.reset();
+    }
+    if (contactSuccess) contactSuccess.style.display = 'none';
+    openModal(contactModal);
+    var firstField = document.getElementById('contact-name');
+    if (firstField) firstField.focus();
+  }
+
+  function closeContactModal() {
+    closeModal(contactModal);
+  }
+
+  if (contactBtn) contactBtn.addEventListener('click', openContactModal);
+  if (contactCancelBtn) contactCancelBtn.addEventListener('click', closeContactModal);
+  if (contactCloseBtn) contactCloseBtn.addEventListener('click', closeContactModal);
+  if (contactModal) {
+    contactModal.addEventListener('click', function (e) {
+      if (e.target === contactModal) closeContactModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && contactModal.style.display !== 'none') closeContactModal();
+    });
+  }
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var nameInput = document.getElementById('contact-name');
+      var emailInput = document.getElementById('contact-email');
+      var messageInput = document.getElementById('contact-message');
+      var nameVal = nameInput.value.trim();
+      var emailVal = emailInput.value.trim();
+      var messageVal = messageInput.value.trim();
+
+      if (!nameVal) {
+        alert('Please enter your name.');
+        markError(nameInput);
+        return;
+      }
+      if (!emailVal || !isValidEmail(emailVal)) {
+        alert('Please enter a valid email address.');
+        markError(emailInput);
+        return;
+      }
+      if (!messageVal) {
+        alert('Please enter a message.');
+        markError(messageInput);
+        return;
+      }
+
+      var payload = {
+        type: 'contact',
+        name: nameVal,
+        email: emailVal,
+        message: messageVal,
+        submittedAt: new Date().toISOString()
+      };
+
+      var submitBtn = contactForm.querySelector('.order-submit');
+      if (submitBtn) submitBtn.classList.add('is-loading');
+
+      sendToWebhook(payload)
+        .then(function () {
+          contactForm.style.display = 'none';
+          if (contactSuccess) contactSuccess.style.display = 'block';
+        })
+        .catch(function (err) {
+          console.error('Contact form submission failed:', err);
+          alert("Sorry, something went wrong sending your message. Please try again, or email timetable.support.app@gmail.com directly if it keeps happening.");
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.classList.remove('is-loading');
+        });
     });
   }
 
