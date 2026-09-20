@@ -1,0 +1,11 @@
+UpdateName: Added delivery time updates
+DateNTime: 20/09/2026 00:32
+UpdateDescription: You can now see your earliest and latest delivery times for your tag. Only if you select delivery
+
+UpdateName: Welcome to the update log
+DateNTime: 20/09/2026 00:32
+UpdateDescription: Added the update log, this is where you'll find all the updates to the site, the tags and the apps too.
+
+UpdateName: TimeTable launch!
+DateNTime: 19/09/2026 12:00
+UpdateDescription: FINALLY IT'S UPPPPPPP Unfortunately it's only for Android at the moment, I'll add support for Apple IOS soon, Stay tuned.
