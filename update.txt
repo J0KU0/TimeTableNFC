@@ -1,3 +1,7 @@
+UpdateName: Added Feedback and / or support button on the bottom of the page
+DateNTime: 20/09/2026 9:50
+UpdateDescription: You can now criticise me on how bad I am at building a website! Yay!!11!!!!!11!
+
 UpdateName: Squished those lil' bugs
 DateNTime: 20/09/2026 11:21
 UpdateDescription: Squishy Squishy, Form errors are now fixed and now should receive way less errors.
