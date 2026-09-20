@@ -1,5 +1,9 @@
+UpdateName: Improved security of the site
+DateNTime: 20/09/2026 10:32
+UpdateDescription: Payments and forms now have encryption keys built into them.
+
 UpdateName: Added delivery time updates
-DateNTime: 20/09/2026 00:32
+DateNTime: 20/09/2026 01:15
 UpdateDescription: You can now see your earliest and latest delivery times for your tag. Only if you select delivery
 
 UpdateName: Welcome to the update log
