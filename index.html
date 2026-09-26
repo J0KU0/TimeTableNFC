@@ -1483,6 +1483,14 @@ textarea.text-input {
         </div>
 
         <div class="field">
+          <label class="field-label">Tag colour</label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="tag-colour" value="black"> Black</label>
+            <label class="radio-option"><input type="radio" name="tag-colour" value="white"> White</label>
+          </div>
+        </div>
+
+        <div class="field">
           <label class="field-label">Delivery or collection?</label>
           <div class="radio-group">
             <label class="radio-option"><input type="radio" name="method" value="delivery"> Delivery</label>
@@ -2436,6 +2444,12 @@ textarea.text-input {
         return;
       }
 
+      var colourChecked = form.querySelector('input[name="tag-colour"]:checked');
+      if (!colourChecked) {
+        alert('Please choose a tag colour.');
+        return;
+      }
+
       var methodChecked = form.querySelector('input[name="method"]:checked');
       if (!methodChecked) {
         alert('Please choose delivery or collection.');
@@ -2513,6 +2527,7 @@ textarea.text-input {
       var payload = {
         type: 'tag-order',
         bankName: nameVal,
+        tagColour: colourChecked.value,
         method: methodChecked.value,
         email: emailVal,
         phone: phoneVal,
