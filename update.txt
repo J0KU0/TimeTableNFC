@@ -1,3 +1,14 @@
+UpdateName: The Huge Update :0
+DateNTime: 28/09/2026 14:48
+UpdateDescription: Improved UI, Better visuals, Cleaner Buttons
+Added "Swipe Mode" Lets you swipe through days instead of manually selecting them, enable this in settings
+Added Permanent Notifications throughout the day, Check what you have and how long you have left.
+Added Horizontal app mode
+Fixed a bug where free period wasn't showing in the current section
+Added setting to disable notifications through the app directly
+Removed "currently: No Class" if it's not today.
+Now Runs in Background
+
 UpdateName: Tons of new features in the app
 DateNTime: 25/09/2026 1:37
 UpdateDescription: We now have notifications. Yay!, Customise them or test them in the setting button on the bottom left corner, the auto-refresh feature has now been remade and now doesn't display a spinning circle
