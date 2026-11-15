@@ -1,3 +1,7 @@
+UpdateName: Apple Release > Moved out of Beta into Release
+DateNTime: 15/11/26 14:27
+UpdateDescription: Finally added app support for iPhone (no NFC Tag support YET though 😔), FREE ACCESS FOR 2 YEARS FOR LORETO COLLEGE STUDENTS 🥳🎉. Please go to the order page for more information on how to get approved.
+
 UpdateName: Another Big Update!1!11!!1
 DateNTime: 05/11/26 13:01
 UpdateDescription: Added Custom TimeTables, Allowing you to Change the time, date and class you have if you ever get a change. (Do this in settings) Added 120Hz support for higher end devices. Added reminders (Custom notifications, Homework, Trips or extra curricular lesson out of school hours, set it to once, daily, weekly or any date in a month for a specific time.
