@@ -267,6 +267,61 @@ header {
   .nav-links { display: none; }
 }
 
+.promo-banner {
+  position: relative;
+  background: #194398;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  padding: 11px 48px;
+}
+.promo-banner a {
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.promo-banner a:hover { opacity: 0.85; }
+.promo-banner.is-closed,
+body.overlay-open .promo-banner { display: none; }
+.promo-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+.promo-close:hover { background: rgba(255, 255, 255, 0.18); }
+
+@keyframes appBtnPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(25, 67, 152, 0.55); }
+  100% { box-shadow: 0 0 0 18px rgba(25, 67, 152, 0); }
+}
+.btn-pulse { animation: appBtnPulse 0.9s ease-out 3; }
+
+.cycle-h2 { display: grid; }
+.cycle-msg {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.cycle-msg.is-active { opacity: 1; transform: translateY(0); }
+
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -454,17 +509,20 @@ section { padding: 84px 0; }
 
 .price-row {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto auto;
   grid-auto-flow: column;
-  gap: 32px;
+  gap: 24px;
 }
+
+.price-row .price-card,
+.price-row .included-card { padding: 30px; }
 
 .included-row {
   margin-top: 32px;
 }
 
-@media (max-width: 780px) {
+@media (max-width: 900px) {
   .price-row {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -1240,6 +1298,11 @@ textarea.text-input {
 </head>
 <body>
 
+<div class="promo-banner" id="promo-banner" role="region" aria-label="Announcement">
+  Loreto College students get it for free, click <a href="#get-app-btn" id="promo-link">this</a> to apply!
+  <button type="button" class="promo-close" id="promo-close" aria-label="Close banner">&times;</button>
+</div>
+
 <header>
   <div class="wrap nav">
     <div class="brand">TimeTable<span class="logo-splash" id="brand-logo-btn" role="button" tabindex="0" aria-label="NFC icon"><span class="brand-logo"></span></span></div>
@@ -1249,7 +1312,7 @@ textarea.text-input {
       <a href="#updates">Updates</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <a class="nav-cta" href="#pricing">Get your tag</a>
+    <a class="nav-cta" href="#pricing">Get the Tag / App</a>
   </div>
 </header>
 
@@ -1272,8 +1335,8 @@ textarea.text-input {
 
   <div class="strip">
     <div class="wrap">
-      <div><strong>Fast app</strong> - opens instantly</div>
-      <div><strong>Works on Android</strong> - with NFC</div>
+      <div><strong>Instant app</strong> - Offline</div>
+      <div><strong>Works on both IOS and Android</strong> - with NFC</div>
       <div><strong>Update table</strong> - update the TimeTable any time</div>
     </div>
   </div>
@@ -1291,13 +1354,13 @@ textarea.text-input {
       </div>
       <div class="step reveal">
         <div class="step-num">02</div>
-        <h3>Point it at your timetable</h3>
+        <h3>Point your phone at the tag</h3>
         <p>Tap the tag once with your own phone and it'll open your timetable page in only a few seconds.</p>
       </div>
       <div class="step reveal">
         <div class="step-num">03</div>
         <h3>Changed phone? No problem</h3>
-        <p>Nothing will change, just reinstall the app and you're back up and running. Simple.</p>
+        <p>Nothing will change, just reinstall the app, deauthorise your old phone and you're back up and running. Simple.</p>
       </div>
     </div>
   </section>
@@ -1305,10 +1368,42 @@ textarea.text-input {
   <section id="pricing">
     <div class="section-head reveal">
       <h2>One tag, one simple price</h2>
-      <p>Covers the tag itself and the link behind it, which needs to stay live and editable for as long as you're using it.</p>
+      <p>Covers the tag itself and the app / link behind it, which stays live and editable for as long as you're using it.</p>
     </div>
 
     <div class="price-row">
+      <div class="price-card reveal">
+        <div style="font-size:14px; color:var(--ink-soft);">App / Site Access</div>
+        <div class="price-figure">
+          <span class="amount">£0.50</span>
+        </div>
+        <div class="price-then">One time payment | Subscription not required</div>
+
+        <ul class="price-list">
+          <li><span class="check">🚚</span> One NFC tag, delivered to you</li>
+          <li><span class="check">📱</span> Works with any NFC-capable phone</li>
+          <li><span class="check">🕙</span> Change the times for your lessons whenever you like</li>
+          <li><span class="check">🚫</span> Internet not needed</li>
+        </ul>
+
+        <div class="price-cta">
+          <a class="btn btn-primary" href="#" id="get-app-btn">Get the app</a>
+        </div>
+      </div>
+
+      <div class="included-card reveal">
+        <h3 style="font-size:19px;">What do I get?</h3>
+        <p style="margin-top:10px; color:var(--ink-soft); font-size:15px;">An extremely cheap, subscription. It just keeps TimeTable fully and freshly and bugs exterminated.</p>
+
+        <ul class="price-list" style="margin-top:16px;">
+          <li><span class="check">🔁</span> Renew the subscription every 6 months at £2</li>
+          <li><span class="check">✓</span> Just install the new app every update</li>
+          <li><span class="check">✖️</span> Cancel any time, just reply to your confirmation email or leave it ghosted :(</li>
+        </ul>
+
+        <p style="margin-top:20px; color:var(--ink-faint); font-size:13px;">Not sure yet? You can always subscribe later - your tag works exactly the same either way.</p>
+      </div>
+
       <div class="price-card reveal">
         <span class="price-badge">1 Sold</span>
         <div style="font-size:14px; color:var(--ink-soft);">TimeTable NFC tag</div>
@@ -1353,8 +1448,8 @@ textarea.text-input {
         <div class="price-then">Optional - on top of your one-off tag</div>
 
         <ul class="price-list">
-          <li><span class="check">🕷️</span> Bug and error fixes</li>
-          <li><span class="check">✨</span> Optional brand new updates</li>
+          <li><span class="check">🆕</span> Early Access (if opted in)</li>
+          <li><span class="check">✨</span> Brand new tag replacement, if requested</li>
           <li><span class="check">↩️</span> Priority replies when you send feedback</li>
           <li><span class="check">🏃</span> Keeps the project up and running</li>
         </ul>
@@ -1410,34 +1505,37 @@ textarea.text-input {
     <div class="faq">
       <details class="qa reveal" open>
         <summary>Do I need to install an app? <span class="plus">+</span></summary>
-        <p>Unfortunately yes however the app is very small, offline and extremely fast.</p>
+        <p>Nope, just request the website or the app on the purchasing page.</p>
       </details>
       <details class="qa reveal">
-        <summary>Which phones does this work with? <span class="plus">+</span></summary>
-        <p>Any Android phone with an NFC reader, you can check by searching up "Does my (phone model) have an NFC reader?"</p>
+        <summary>Which phones work with the tag? <span class="plus">+</span></summary>
+        <p>Any IOS / Android phone with an NFC reader, you can check by searching up "Does my (phone model) have an NFC reader?"</p>
       </details>
       <details class="qa reveal">
         <summary>What if my timetable changes next term? <span class="plus">+</span></summary>
-        <p>If your timetable ever changes, there is a feature in the app that allows you to change it in the settings section, just open the menu and hold it  down for 3 seconds.</p>
+        <p>If your timetable ever changes, there is a feature in the app that allows you to change it in the settings section, just open the menu and hold it down for 3 seconds.</p>
       </details>
       <details class="qa reveal">
         <summary>Do I need the subscription for it to work? <span class="plus">+</span></summary>
-        <p>Absolutely not, the subscription is there to support my project while giving you fresh new updates and prioritised feedback from you.</p>
+        <p>Absolutely not, the subscription is there to support the project while giving you fresh new updates and prioritised feedback from you.</p>
       </details>
       <details class="qa reveal">
         <summary>What if I lose my TimeTable Tag? <span class="plus">+</span></summary>
-        <p>Order a new tag at the same price and you're back up and running. Your subscription stays.</p>
+        <p>Order a new tag at the same price and you're back up and running. If you have the TimeTable+ subscription, please contact our support email at the bottom of this page.</p>
       </details>
       <details class="qa reveal">
-        <summary>Will iPhones ever be supported? <span class="plus">+</span></summary>
-        <p>I'm working on bringing the app support to IOS, however everything is ran by one person so it may take some time, stay tuned for more updates.</p>
+        <summary>What Phones will be supported? <span class="plus">+</span></summary>
+        <p>Both Android and Apple phones are supported, Computer / PC support will be very soon.</p>
       </details>
     </div>
   </section>
 
   <section style="padding-top:0;">
     <div class="closer reveal">
-      <h2>Stop navigating through 5 different links just to find a room number.</h2>
+      <h2 class="cycle-h2" id="closer-cycle">
+        <span class="cycle-msg is-active">Stop navigating through 5 different links just to find a room number.</span>
+        <span class="cycle-msg">Data not working? No problem.</span>
+      </h2>
       <a class="btn btn-primary" href="#pricing">Get your tag for just £1</a>
     </div>
   </section>
@@ -1861,6 +1959,7 @@ textarea.text-input {
       siteHeader.style.display = 'none';
       siteMain.style.display = 'none';
       siteFooter.style.display = 'none';
+      document.body.classList.add('overlay-open');
       page.style.display = 'block';
       window.scrollTo(0, 0);
 
@@ -1904,6 +2003,7 @@ textarea.text-input {
       siteHeader.style.display = '';
       siteMain.style.display = '';
       siteFooter.style.display = '';
+      document.body.classList.remove('overlay-open');
       window.scrollTo(0, 0);
 
       if (!prefersReduced) {
@@ -2163,6 +2263,37 @@ textarea.text-input {
   }
 
   bindOverlayTrigger(orderBtn, showOrderPage);
+  var getAppBtn = document.getElementById('get-app-btn');
+  bindOverlayTrigger(getAppBtn, showOrderPage);
+
+  var promoBanner = document.getElementById('promo-banner');
+  var promoClose = document.getElementById('promo-close');
+  var promoLink = document.getElementById('promo-link');
+  if (promoClose && promoBanner) {
+    promoClose.addEventListener('click', function () {
+      promoBanner.classList.add('is-closed');
+    });
+  }
+  if (promoLink && getAppBtn) {
+    promoLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      getAppBtn.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
+      getAppBtn.classList.remove('btn-pulse');
+      void getAppBtn.offsetWidth;
+      getAppBtn.classList.add('btn-pulse');
+      setTimeout(function () { getAppBtn.classList.remove('btn-pulse'); }, 3000);
+    });
+  }
+
+  var cycleMsgs = document.querySelectorAll('#closer-cycle .cycle-msg');
+  if (cycleMsgs.length > 1) {
+    var cycleIdx = 0;
+    setInterval(function () {
+      cycleMsgs[cycleIdx].classList.remove('is-active');
+      cycleIdx = (cycleIdx + 1) % cycleMsgs.length;
+      cycleMsgs[cycleIdx].classList.add('is-active');
+    }, 4000);
+  }
   bindOverlayTrigger(subscribeBtn, openSubscribeGate);
   bindOverlayTrigger(document.getElementById('updates-show-all'), showUpdatesPage);
   if (backBtn) backBtn.addEventListener('click', hideOverlayPage);
@@ -2260,6 +2391,7 @@ textarea.text-input {
 
   function finishOrder(fromPage, monzoLink) {
     fromPage.style.display = 'none';
+    document.body.classList.add('overlay-open');
     var payBtn = document.getElementById('confirmation-pay-btn');
     var payNote = document.getElementById('confirmation-pay-note');
     if (payBtn) payBtn.href = monzoLink;
